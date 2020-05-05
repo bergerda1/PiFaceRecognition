@@ -15,9 +15,13 @@ previously scanned people and give live audio feedback who is visible during a v
 
 ## How to scan and recognize people
 hardware:
+
 Raspberry 4B 4Gb
+
 Coral USB Accelerator
+
 Raspberry Pi Camera v2
+
 Mini External USB 2.0 Speaker
 
 Before you continue, check if all libraries from requirements.txt are installed.
