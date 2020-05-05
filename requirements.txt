@@ -1,0 +1,10 @@
+pyttsx3
+espeak (sudo apt-get install python-espeak)
+cv2
+time
+numpy
+picamera
+Pillow
+
+install edge tpu:
+https://coral.ai/docs/accelerator/get-started/#requirements
