@@ -40,6 +40,9 @@ def main():
   person_number = 1 # Change the number of the person you scan. It will create a new number for that person
   count_images_saved = 0
   
+  if os.path.isdir('scanned_people') == False:
+    os.mkdir('scanned_people')
+  
   if os.path.isdir('scanned_people/' + str(person_number)) == False:
     os.mkdir('scanned_people/' + str(person_number))
     os.mkdir('scanned_people/' + str(person_number) + '/png')
