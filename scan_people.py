@@ -5,6 +5,9 @@ For default values in "recognize_face.py" you need to get at least 20 pictures p
 
 Important: For each new person, increase the variable "str(person_number)" in main() by 1. This "str(person_number)" will define the foldername
 where the images of the scanned person will be saved.
+
+If you do not have an Edge TPU or you want to see the performance difference, change the
+variable ifEdgeTPU_1_else_0 in main() to 0.
 """
 
 import io
@@ -29,9 +32,17 @@ CAMERA_HEIGHT = 960
 
 
 def main():
+    
+  ifEdgeTPU_1_else_0 = 1
+  
   labels = load_labels('coco_labels.txt')
-  interpreter = Interpreter(model_path = 'models/ssd_mobilenet_v2_face_quant_postprocess_edgetpu.tflite',
-    experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
+  
+  if ifEdgeTPU_1_else_0 == 1:
+      interpreter = Interpreter(model_path = 'models/ssd_mobilenet_v2_face_quant_postprocess_edgetpu.tflite',
+        experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
+  else:
+      interpreter = Interpreter(model_path = 'models/ssd_mobilenet_v2_face_quant_postprocess.tflite')
+  
   interpreter.allocate_tensors()
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
   
@@ -42,7 +53,7 @@ def main():
   
   if os.path.isdir('scanned_people') == False:
     os.mkdir('scanned_people')
-  
+      
   if os.path.isdir('scanned_people/' + str(person_number)) == False:
     os.mkdir('scanned_people/' + str(person_number))
     os.mkdir('scanned_people/' + str(person_number) + '/png')

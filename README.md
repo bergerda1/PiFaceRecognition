@@ -1,7 +1,7 @@
 # Face Recognition with Edge TPU
 
 This repository contains a trained model for the Coral edge TPU, creating embedding representations for
-facial recognition. Face recognition is a two stage task: First faces are detected 
+facial recognition. This allows fast inference on a local device. Face recognition is a two stage task: First faces are detected 
 (resulting in a cropped image with the face) and in the second stage these images are transformed to an
 embedding representing that face (1-D array). For face detection the following pretrained model was used:
 https://coral.ai/examples/detect-image/#run-the-example-for-face-detection. The model for the embeddings
@@ -42,3 +42,8 @@ Start by replacing "Alfred Maier" with the person scanned and saved in folder nu
 ### Run Face Recognition
 Run recognize_face.py to detect faces in a live stream, create embeddings of detected people and compare
 with the embeddings that have already been recored and labeled. Read more detailed instructions within the code file.
+
+
+## Use without Edge TPU
+The python scripts also work without Edge TPU. In each file there is a variable "ifEdgeTPU_1_else_0" that can be
+set to 0.

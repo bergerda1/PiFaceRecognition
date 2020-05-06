@@ -1,6 +1,9 @@
 """
 Run to recognize people that were scanned previously. When a person with name "X" is recognized, the program will give an
 auidio output saying "Hello X".
+
+If you do not have an Edge TPU or you want to see the performance difference, change the
+variable ifEdgeTPU_1_else_0 in main() to 0.
 """
 
 #from __future__ import absolute_import
@@ -34,18 +37,26 @@ CAMERA_HEIGHT = 960
 
 def main():
 
-
+  ifEdgeTPU_1_else_0 = 1
+  
   labels = load_labels('coco_labels.txt')
   people_lables = load_labels('people_labels.txt')
-  interpreter = Interpreter(model_path = 'models/ssd_mobilenet_v2_face_quant_postprocess_edgetpu.tflite',
-    experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
+  
+  if ifEdgeTPU_1_else_0 == 1:
+      interpreter = Interpreter(model_path = 'models/ssd_mobilenet_v2_face_quant_postprocess_edgetpu.tflite',
+        experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
+  else:
+      interpreter = Interpreter(model_path = 'models/ssd_mobilenet_v2_face_quant_postprocess.tflite')
+  
   interpreter.allocate_tensors()
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
   
-  #FRmodel = tf.keras.models.load_model('/home/pi/coral/tempCopyGoogleDrive/models/Mobilenet1_triplet1588397957')
-  #FRmodel.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])
-  interpreter_emb = Interpreter(model_path = 'models/Mobilenet1_triplet1588469968_triplet_quant_edgetpu.tflite',
-    experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
+  if ifEdgeTPU_1_else_0 == 1:
+      interpreter_emb = Interpreter(model_path = 'models/Mobilenet1_triplet1588469968_triplet_quant_edgetpu.tflite',
+        experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
+  else:
+      interpreter_emb = Interpreter(model_path = 'models/Mobilenet1_triplet1588469968_triplet_quant.tflite')
+
   interpreter_emb.allocate_tensors()
 
   with picamera.PiCamera(

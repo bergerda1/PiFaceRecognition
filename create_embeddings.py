@@ -3,6 +3,9 @@ Converts the detected faces in the folder "scanned_people" to embeddings, which 
 
 Important: You have to execute this code for each subfolder in "scanned_people". To do so change the variable
 "scan_person" in main() for each folder number.
+
+If you do not have an Edge TPU or you want to see the performance difference, change the
+variable ifEdgeTPU_1_else_0 in main() to 0.
 """
 
 import os
@@ -18,11 +21,18 @@ from tflite_runtime.interpreter import Interpreter
 
 def main():
     
-    scan_person = 1 # Change the number of the folder, where you want to create the embeddings
+    ifEdgeTPU_1_else_0 = 1
     
+    scan_person = 1 # Change the number of the folder, where you want to create the embeddings
 
-    interpreter = Interpreter(model_path = 'models/Mobilenet1_triplet1588469968_triplet_quant_edgetpu.tflite',
+    
+    if ifEdgeTPU_1_else_0 == 1:
+      interpreter = Interpreter(model_path = 'models/Mobilenet1_triplet1588469968_triplet_quant_edgetpu.tflite',
         experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
+    else:
+      interpreter = Interpreter(model_path = 'models/Mobilenet1_triplet1588469968_triplet_quant.tflite')
+
+    
     interpreter.allocate_tensors()
 
     
