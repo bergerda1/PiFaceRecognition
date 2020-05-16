@@ -7,7 +7,7 @@ embedding representing that face (1-D array). For face detection the following p
 https://coral.ai/examples/detect-image/#run-the-example-for-face-detection. The model for the embeddings
 takes as input 96*96 arrays, values between 0 and 1, and outputs a 1-D array of size 192. The Facenet paper 
 (https://arxiv.org/abs/1503.03832) recommends an output size of 128, but this results in an error when converting
-to an edge TPU model. As a base model MobileNetV2 is used. So far the model has been trained on a quater of
+to an edge TPU model. As a base model MobileNetV2 is used. So far the model has been trained on a third of
 the VGGFace2 dataset. Updated models will follow.
 
 In the following I will explain how this model can be used on a project with the Raspberry Pi to recognize
@@ -47,3 +47,8 @@ with the embeddings that have already been recored and labeled. Read more detail
 ## Use without Edge TPU
 The python scripts also work without Edge TPU. In each file there is a variable "ifEdgeTPU_1_else_0" that can be
 set to 0.
+
+here is the link to the notebook, where I trained the model:
+https://colab.research.google.com/drive/1n-cMQ_mP0t40OOzfIJwGLPu_0gkYnHNK?usp=sharing
+
+for questions write to: damian.berger@me.com

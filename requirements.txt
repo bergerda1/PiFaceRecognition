@@ -1,10 +1,12 @@
 pyttsx3
 espeak (sudo apt-get install python-espeak)
-cv2
-time
+cv2 (on RPi: pip3 install opencv-python==3.4.6.27)
 numpy
 picamera
 Pillow
+
+install tflite:
+https://www.tensorflow.org/lite/guide/python
 
 install edge tpu:
 https://coral.ai/docs/accelerator/get-started/#requirements

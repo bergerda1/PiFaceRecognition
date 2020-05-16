@@ -6,10 +6,6 @@ If you do not have an Edge TPU or you want to see the performance difference, ch
 variable ifEdgeTPU_1_else_0 in main() to 0.
 """
 
-#from __future__ import absolute_import
-#from __future__ import division
-#from __future__ import print_function
-
 import io
 import re
 import os
@@ -42,6 +38,7 @@ def main():
   labels = load_labels('coco_labels.txt')
   people_lables = load_labels('people_labels.txt')
   
+  #get interpreter for face detection model
   if ifEdgeTPU_1_else_0 == 1:
       interpreter = Interpreter(model_path = 'models/ssd_mobilenet_v2_face_quant_postprocess_edgetpu.tflite',
         experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
@@ -51,11 +48,12 @@ def main():
   interpreter.allocate_tensors()
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
   
+  #get interpreter for face embedding model
   if ifEdgeTPU_1_else_0 == 1:
-      interpreter_emb = Interpreter(model_path = 'models/Mobilenet1_triplet1588469968_triplet_quant_edgetpu.tflite',
+      interpreter_emb = Interpreter(model_path = 'models/Mobilenet1_triplet1589223569_triplet_quant_edgetpu.tflite',
         experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
   else:
-      interpreter_emb = Interpreter(model_path = 'models/Mobilenet1_triplet1588469968_triplet_quant.tflite')
+      interpreter_emb = Interpreter(model_path = 'models/Mobilenet1_triplet1589223569_triplet_quant.tflite')
 
   interpreter_emb.allocate_tensors()
 
@@ -110,6 +108,7 @@ def main():
       camera.stop_preview()
 
 def get_person_from_embedding(people_lables,emb):
+    #Comares embedding to embedding of scaned people to determine who is on the picture
     num_emb_check = 20
     path = 'scanned_people/'
     folders = os.listdir(path)
@@ -153,7 +152,7 @@ def get_person_from_embedding(people_lables,emb):
         engine.runAndWait()
 
 def load_labels(path):
-  """Loads the labels file. Supports files with or without index numbers."""
+  #Loads the labels file. Supports files with or without index numbers.
   with open(path, 'r', encoding='utf-8') as f:
     lines = f.readlines()
     labels = {}
@@ -167,19 +166,20 @@ def load_labels(path):
 
 
 def set_input_tensor(interpreter, image):
-  """Sets the input tensor."""
+  #Sets the input tensor.
   tensor_index = interpreter.get_input_details()[0]['index']
   input_tensor = interpreter.tensor(tensor_index)()[0]
   input_tensor[:, :] = image
 
 
 def get_output_tensor(interpreter, index):
-  """Returns the output tensor at the given index."""
+  #Returns the output tensor at the given index.
   output_details = interpreter.get_output_details()[index]
   tensor = np.squeeze(interpreter.get_tensor(output_details['index']))
   return tensor
 
 def set_input_tensor_emb(interpreter, input):
+    #Sets input sensor for face embedding model
     input_details = interpreter.get_input_details()[0]
     tensor_index = input_details['index']
     scale, zero_point = input_details['quantization']
@@ -189,6 +189,7 @@ def set_input_tensor_emb(interpreter, input):
 
 
 def img_to_emb(interpreter,input):
+    #returns embedding vector, using the face embedding model
     set_input_tensor_emb(interpreter, input)
     interpreter.invoke()
     output_details = interpreter.get_output_details()[0]
@@ -199,7 +200,7 @@ def img_to_emb(interpreter,input):
     return emb
 
 def detect_objects(interpreter, image, threshold):
-  """Returns a list of detection results, each a dictionary of object info."""
+  #Returns a list of detection results, each a dictionary of object info.
   set_input_tensor(interpreter, image)
   interpreter.invoke()
 
@@ -221,6 +222,7 @@ def detect_objects(interpreter, image, threshold):
   return results
 
 def get_best_box_param(results,CAMERA_WIDTH, CAMERA_HEIGHT):
+    #Returns the box parameters for the box with the highest score
     best_boxvalue = 0
     xmin = 0
     xmax = 1
@@ -246,7 +248,7 @@ def get_best_box_param(results,CAMERA_WIDTH, CAMERA_HEIGHT):
     return ymin, xmin, ymax, xmax, best_boxvalue
 
 def annotate_objects(annotator, results, labels):
-  """Draws the bounding box and label for each object in the results."""
+  #Draws the bounding box and label for each object in the results.
   for obj in results:
     # Convert the bounding box figures from relative coordinates
     # to absolute coordinates based on the original resolution
@@ -260,12 +262,7 @@ def annotate_objects(annotator, results, labels):
     annotator.bounding_box([xmin, ymin, xmax, ymax])
     annotator.text([xmin, ymin],
                    '%s\n%.2f' % (labels[obj['class_id']], obj['score']))
-    #annotator.text([150,300],"Felix")
     
-
-    
-
-
 
 
 

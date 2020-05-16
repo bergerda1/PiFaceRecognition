@@ -6,6 +6,8 @@ For default values in "recognize_face.py" you need to get at least 20 pictures p
 Important: For each new person, increase the variable "str(person_number)" in main() by 1. This "str(person_number)" will define the foldername
 where the images of the scanned person will be saved.
 
+Adjust the variable "camera.rotation" to fit your configuration
+
 If you do not have an Edge TPU or you want to see the performance difference, change the
 variable ifEdgeTPU_1_else_0 in main() to 0.
 """
@@ -37,6 +39,7 @@ def main():
   
   labels = load_labels('coco_labels.txt')
   
+  #get interpreter for face detection model
   if ifEdgeTPU_1_else_0 == 1:
       interpreter = Interpreter(model_path = 'models/ssd_mobilenet_v2_face_quant_postprocess_edgetpu.tflite',
         experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
@@ -113,7 +116,7 @@ def main():
 
 
 def load_labels(path):
-  """Loads the labels file. Supports files with or without index numbers."""
+  #Loads the labels file. Supports files with or without index numbers.
   with open(path, 'r', encoding='utf-8') as f:
     lines = f.readlines()
     labels = {}
@@ -127,21 +130,21 @@ def load_labels(path):
 
 
 def set_input_tensor(interpreter, image):
-  """Sets the input tensor."""
+  #Sets the input tensor.
   tensor_index = interpreter.get_input_details()[0]['index']
   input_tensor = interpreter.tensor(tensor_index)()[0]
   input_tensor[:, :] = image
 
 
 def get_output_tensor(interpreter, index):
-  """Returns the output tensor at the given index."""
+  #Returns the output tensor at the given index.
   output_details = interpreter.get_output_details()[index]
   tensor = np.squeeze(interpreter.get_tensor(output_details['index']))
   return tensor
 
 
 def detect_objects(interpreter, image, threshold):
-  """Returns a list of detection results, each a dictionary of object info."""
+  #Returns a list of detection results, each a dictionary of object info.
   set_input_tensor(interpreter, image)
   interpreter.invoke()
 
@@ -163,6 +166,7 @@ def detect_objects(interpreter, image, threshold):
   return results
 
 def get_best_box_param(results,CAMERA_WIDTH, CAMERA_HEIGHT):
+    #Returns the box parameters for the box with the highest score
     best_boxvalue = 0
     xmin = 0
     xmax = 1
@@ -189,7 +193,7 @@ def get_best_box_param(results,CAMERA_WIDTH, CAMERA_HEIGHT):
 
 
 def annotate_objects(annotator, results, labels):
-  """Draws the bounding box and label for each object in the results."""
+  #Draws the bounding box and label for each object in the results.
   for obj in results:
     # Convert the bounding box figures from relative coordinates
     # to absolute coordinates based on the original resolution
@@ -203,7 +207,6 @@ def annotate_objects(annotator, results, labels):
     annotator.bounding_box([xmin, ymin, xmax, ymax])
     annotator.text([xmin, ymin],
                    '%s\n%.2f' % (labels[obj['class_id']], obj['score']))
-
 
 
 
